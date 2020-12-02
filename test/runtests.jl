@@ -1,10 +1,10 @@
-basepath = "$(@__DIR__)/../src/"
-
-for day in 1:25
-    path = joinpath(basepath, "day$day.jl")
-    isfile(path) && include(path)
-end
+# For some reason `using advent2020` disables all the tests.
+include(joinpath(dirname(@__DIR__), "src", "advent2020.jl"))
 
 using ReTest
 
-runtests(r"/d")
+if isempty(ARGS)
+    runtests(r"/d")
+else
+    runtests(first(ARGS))
+end

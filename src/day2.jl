@@ -22,7 +22,7 @@ In the above example, 2 passwords are valid. The middle password, cdefg, is not;
 module day2
 
 function get_input()
-    map(readlines("data/day2")) do line
+    map(eachline("data/day2")) do line
         policy, pass = split(line, ": ")
         lohi, (char,) = split(policy)
         lohi = parse.(Int, split(lohi, "-"))
@@ -63,8 +63,8 @@ using ReTest
     @eval begin
         input = get_input()
         @info "Day 2"
-        @btime part1($input)
-        @btime part2($input)
+        @btime part1(input)
+        @btime part2(input)
         println()
     end
 end
