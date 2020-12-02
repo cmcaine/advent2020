@@ -24,21 +24,18 @@ module day2
 function get_input()
     map(readlines("data/day2")) do line
         policy, pass = split(line, ": ")
-        _range, (char,) = split(policy)
-        lo, hi = parse.(Int, split(_range, "-"))
-        return lo:hi, char, pass
+        lohi, (char,) = split(policy)
+        lohi = parse.(Int, split(lohi, "-"))
+        return lohi, char, pass
     end
 end
-
-input = get_input()
-
 
 """
 How many passwords are valid according to their policies?
 """
 function part1(input)
-    count(input) do (range, char, pass)
-        count(==(char), pass) in range
+    count(input) do ((lo, hi), char, pass)
+        count(==(char), pass) in lo:hi
     end
 end
 
@@ -54,9 +51,8 @@ Given the same example list from above:
 How many passwords are valid according to the new interpretation of the policies?
 """
 function part2(input)
-    count(input) do (range, char, pass)
-        x, y = first(range), last(range)
-        count(pass[x] == char for x in (first(range), last(range))) == 1
+    count(input) do ((lo, hi), char, pass)
+        (pass[lo] == char) ⊻ (pass[hi] == char)
     end
 end
 
