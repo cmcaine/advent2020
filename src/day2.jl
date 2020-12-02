@@ -59,7 +59,7 @@ function part2(input)
 end
 
 # alternate implementation
-function part2(input)
+function part2a(input)
     count(input) do (lohi, char, pass)
         count(==(char), pass[lohi]) == 1
     end
@@ -74,6 +74,7 @@ using ReTest
         @info "Day 2"
         @btime part1(input)
         @btime part2(input)
+        @btime part2a(input)
         println()
     end
 end
