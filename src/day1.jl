@@ -17,6 +17,17 @@ function part1(input)
     return 1010^2
 end
 
+# Adapted from a solution on reddit.
+function part1a(input)
+    set = BitSet()
+    for a in input
+        b = 2020 - a
+        b in set && return a * b
+        push!(set, a)
+    end
+    error()
+end
+
 
 """
 Find three values from `input` that sum to 2020. There will be exactly one such triple.
@@ -66,8 +77,9 @@ end
     @eval begin
         input = get_input()
         @info "Day 1"
-        @btime part1($input)
-        @btime part2($input)
+        @btime part1(input)
+        @btime part1a(input)
+        @btime part2(input)
         println()
     end
 end
