@@ -1,0 +1,9 @@
+name = "advent2020"
+uuid = "24b44e97-84cb-4c81-abc5-91d06350ffe0"
+authors = ["Colin Caine <cmcaine@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+ReTest = "e0db7c4e-2690-44b9-bad6-7687da720f89"
