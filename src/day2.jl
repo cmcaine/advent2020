@@ -23,9 +23,11 @@ module day2
 
 function get_input()
     map(eachline("data/day2")) do line
-        policy, pass = split(line, ": ")
-        lohi, (char,) = split(policy)
-        lohi = parse.(Int, split(lohi, "-"))
+        lo, hi, (char,), pass = match(r"^(\d+)-(\d+) (\w): (.+)$", line).captures
+        lohi = parse.(Int, [lo, hi])
+        # collect the pass so that we can easily index on unicode codepoints
+        # which obviously won't be tested, but w/e.
+        pass = collect(pass)
         return lohi, char, pass
     end
 end
@@ -53,6 +55,13 @@ How many passwords are valid according to the new interpretation of the policies
 function part2(input)
     count(input) do ((lo, hi), char, pass)
         (pass[lo] == char) ⊻ (pass[hi] == char)
+    end
+end
+
+# alternate implementation
+function part2(input)
+    count(input) do (lohi, char, pass)
+        count(==(char), pass[lohi]) == 1
     end
 end
 
