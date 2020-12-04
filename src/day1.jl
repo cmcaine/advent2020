@@ -68,19 +68,21 @@ end
 using ReTest
 
 @testset "day1" begin
-    @test part1([505, 672, 673, 675, 1010, 1515]) == 505 * 1515
-    @test part2([505, 672, 673, 675, 1010]) == 672 * 673 * 675
-end
+    @testset "inappropriate repeats" begin
+        @test part1([505, 672, 673, 675, 1010, 1515]) == 505 * 1515
+        @test part2([505, 672, 673, 675, 1010]) == 672 * 673 * 675
+    end
 
-@testset "bench" begin
-    @eval using BenchmarkTools
-    @eval begin
-        input = get_input()
-        @info "Day 1"
-        @btime part1(input)
-        @btime part1a(input)
-        @btime part2(input)
-        println()
+    @testset "bench" begin
+        @eval using BenchmarkTools
+        @eval begin
+            input = get_input()
+            @info "Day 1"
+            @btime part1(input)
+            @btime part1a(input)
+            @btime part2(input)
+            println()
+        end
     end
 end
 

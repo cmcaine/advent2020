@@ -67,15 +67,17 @@ end
 
 using ReTest
 
-@testset "bench" begin
-    @eval using BenchmarkTools
-    @eval begin
-        input = get_input()
-        @info "Day 2"
-        @btime part1(input)
-        @btime part2(input)
-        @btime part2a(input)
-        println()
+@testset "day2" begin
+    @testset "bench" begin
+        @eval using BenchmarkTools
+        @eval begin
+            input = get_input()
+            @info "Day 2"
+            @btime part1(input)
+            @btime part2(input)
+            @btime part2a(input)
+            println()
+        end
     end
 end
 
