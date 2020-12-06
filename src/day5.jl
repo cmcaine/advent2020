@@ -10,20 +10,20 @@ function get_input(str::String)
 end
 
 # TIL: *2^(10 - i) isn't optimised into a bitshift
-seat_number(pass) = sum((x == 'B' || x == 'R') << (10 - i) for (i, x) in enumerate(pass))
+seat_id(pass) = sum((x == 'B' || x == 'R') << (10 - i) for (i, x) in enumerate(pass))
 
-part1(passes) = maximum(seat_number, passes)
+part1(passes) = maximum(seat_id, passes)
 
 # Find the seat id, x, s.t. x+1 and x-1 are both in `passes`, where passes is
 # otherwise a contiguous range of seat ids.
 function part2(passes)
-    ids = map(seat_number, passes)
+    ids = map(seat_id, passes)
     (hi, lo) = extrema(ids)
     only(setdiff(hi:lo, ids))
 end
 
 function part2a(passes)
-    ids = map(seat_number, passes) |> sort
+    ids = map(seat_id, passes) |> sort
     for x in 2:length(ids)-1
         a, b = ids[x-1:x]
         a+1 != b && return a+1
