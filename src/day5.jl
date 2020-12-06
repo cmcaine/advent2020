@@ -43,7 +43,8 @@ using ReTest
                 """
         x = get_input(input)
         @test part1(x) == 820
-        @test part2(get_input()) == 603
+        y = get_input()
+        @test part2(y) == 603 == part2a(y)
     end
 
     @testset "bench" begin
@@ -53,6 +54,7 @@ using ReTest
             @info "Day 5"
             @btime part1(input)
             @btime part2(input)
+            @btime part2a(input)
             println()
         end
     end
