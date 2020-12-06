@@ -3,6 +3,8 @@ include(joinpath(dirname(@__DIR__), "src", "advent2020.jl"))
 
 using ReTest
 
+cd(dirname(@__DIR__))
+
 if isempty(ARGS)
     # Run the tests, but not the benchmarks
     runtests(r"/day\d{1,2}/[^b]")
