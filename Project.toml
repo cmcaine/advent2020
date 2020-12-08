@@ -6,5 +6,7 @@ version = "0.1.0"
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+LightGraphs = "093fc24a-ae57-5d10-9952-331d41423f4d"
 Mmap = "a63ad114-7e13-5084-954f-fe012c677804"
 ReTest = "e0db7c4e-2690-44b9-bad6-7687da720f89"
+SimpleWeightedGraphs = "47aef6b3-ad0c-573a-a1e2-d07658019622"
