@@ -26,33 +26,43 @@ Finished part 2: 12:29
 """
 module day14
 
+struct MemOp
+    dest::Int
+    val::Int
+end
+
+struct MaskOp
+    mask::SubString{String}
+end
+
 
 function get_input(str=read("data/day14", String))
     tokens = split(str)
-    instrs = map(1:3:length(tokens)) do idx
+    instrs = Vector{Union{MemOp, MaskOp}}()
+    for idx in 1:3:length(tokens)
         op, ass, val = tokens[idx:idx+2]
         if startswith(op, "mem")
             dest = match(r"\[(\d+)\]$", op).captures[1]
             dest, val = parse.(Int, (dest, val))
-            return :mem, (dest=dest, val=val)
+            push!(instrs, MemOp(dest, val))
         elseif op == "mask"
-            return :mask, val
+            push!(instrs, MaskOp(val))
         else
             error("Unrecognized instruction: $op $ass $val")
         end
     end
+    instrs
 end
 
 function part1_machine(instrs)
     mem = Dict{Int, UInt64}()
-    one_mask = typemin(UInt64)
-    zero_mask = 0x0000000ffffffffff # clamp to 36 bits
-    for (op, args) in instrs
-        if op == :mask
-            mask_str = args
-            one_mask = 0
-            zero_mask = 0
-            for chr in mask_str
+    one_mask = UInt64(0)
+    zero_mask = 0x0000000fffffffff # clamp to 36 bits
+    for op in instrs
+        if op isa MaskOp
+            one_mask = zero(one_mask)
+            zero_mask = zero(zero_mask)
+            for chr in op.mask
                 one_mask <<= 1
                 zero_mask <<= 1
                 if chr == '1'
@@ -69,8 +79,7 @@ function part1_machine(instrs)
                 end
             end
         else
-            dest, val = args
-            mem[dest] = (val & zero_mask) | one_mask
+            mem[op.dest] = (op.val & zero_mask) | one_mask
         end
     end
     return mem
@@ -95,13 +104,13 @@ function part2_machine(instrs)
     # 100x worse performance D:
     # mem = SparseVector(2^36-1, Int[], UInt64[])
     mem = Dict{Int, Int}()
-    one_mask = 0
-    zero_mask = 0x0000000ffffffffff # clamp to 36 bits
+    one_mask = zero(UInt64)
+    zero_mask = 0x0000000fffffffff # clamp to 36 bits
     floating_bits = Int[]
-    for (op, args) in instrs
-        if op == :mask
-            mask_str = args
-            one_mask = 0
+    for op in instrs
+        if op isa MaskOp
+            mask_str = op.mask
+            one_mask = zero(one_mask)
             empty!(floating_bits)
             for (i, chr) in enumerate(mask_str)
                 one_mask <<= 1
@@ -117,9 +126,8 @@ function part2_machine(instrs)
                 end
             end
         else
-            dest, val = args
-            dest = (dest & zero_mask) | one_mask
-            set_float_index!(mem, dest, val, floating_bits, 1)
+            dest = (op.dest & zero_mask) | one_mask
+            set_float_index!(mem, dest, op.val, floating_bits, 1)
         end
     end
     return mem
@@ -141,15 +149,14 @@ part2(instrs) = part2_machine(instrs) |> values |> sum |> Int
 ## Jakob Nissen's bithacking approach
 function part2a_machine(instrs)
     mem = Dict{Int, Int}()
-    one_mask = 0
-    zero_mask = 0x0000000ffffffffff # clamp to 36 bits
-    float_mask = 0
-    for (op, args) in instrs
-        if op == :mask
-            mask_str = args
-            one_mask = 0
-            float_mask = 0
-            for (i, chr) in enumerate(mask_str)
+    one_mask = zero(UInt64)
+    zero_mask = 0x0000000fffffffff # clamp to 36 bits
+    float_mask = zero(UInt64)
+    for op in instrs
+        if op isa MaskOp
+            one_mask = zero(one_mask)
+            float_mask = zero(float_mask)
+            for (i, chr) in enumerate(op.mask)
                 one_mask <<= 1
                 float_mask <<= 1
                 if chr == '1'
@@ -164,7 +171,7 @@ function part2a_machine(instrs)
                 end
             end
         else
-            dest, val = args
+            dest, val = op.dest, op.val
             dest = (dest & zero_mask) | one_mask
             fm = float_mask
             st = fm
@@ -180,6 +187,7 @@ function part2a_machine(instrs)
 end
 
 part2a(instrs) = part2a_machine(instrs) |> values |> sum |> Int
+
 
 using ReTest
 
@@ -200,15 +208,17 @@ using ReTest
                       mem[26] = 1
                       """)
         @test part2(y) == 208
+        @test part2a(y) == 208
     end
 
     @testset "bench" begin
         @eval using BenchmarkTools
         @eval begin
-            input = get_input()
             @info "Day 14"
+            input = @btime get_input()
             @btime part1(input)
             @btime part2(input)
+            @btime part2a(input)
             println()
         end
     end
