@@ -91,12 +91,11 @@ count.(==('X'), masks) |> maximum
 9, doable with a naive approach, I think.
 """
 
-# Don't need this, just fancied it.
-using SparseArrays: SparseVector
-
 function part2_machine(instrs)
-    mem = SparseVector(2^36-1, Int[], UInt64[])
-    one_mask = typemin(UInt64)
+    # 100x worse performance D:
+    # mem = SparseVector(2^36-1, Int[], UInt64[])
+    mem = Dict{Int, Int}()
+    one_mask = 0
     zero_mask = 0x0000000ffffffffff # clamp to 36 bits
     floating_bits = Int[]
     for (op, args) in instrs
@@ -136,8 +135,51 @@ function set_float_index!(mem, dest, val, floating_bits, bit_idx)
     end
 end
 
-part2(instrs) = part2_machine(instrs) |> sum |> Int
+part2(instrs) = part2_machine(instrs) |> values |> sum |> Int
 
+
+## Jakob Nissen's bithacking approach
+function part2a_machine(instrs)
+    mem = Dict{Int, Int}()
+    one_mask = 0
+    zero_mask = 0x0000000ffffffffff # clamp to 36 bits
+    float_mask = 0
+    for (op, args) in instrs
+        if op == :mask
+            mask_str = args
+            one_mask = 0
+            float_mask = 0
+            for (i, chr) in enumerate(mask_str)
+                one_mask <<= 1
+                float_mask <<= 1
+                if chr == '1'
+                    one_mask |= 1
+                elseif chr == '0'
+                    one_mask |= 0
+                elseif chr == 'X'
+                    one_mask |= 0
+                    float_mask |= 1
+                else
+                    error(chr)
+                end
+            end
+        else
+            dest, val = args
+            dest = (dest & zero_mask) | one_mask
+            fm = float_mask
+            st = fm
+            while true
+                inv_st = fm & ~st
+                mem[(dest & ~fm) | st] = val
+                st == 0 && break
+                st = (st - 1) & fm
+            end
+        end
+    end
+    return mem
+end
+
+part2a(instrs) = part2a_machine(instrs) |> values |> sum |> Int
 
 using ReTest
 
