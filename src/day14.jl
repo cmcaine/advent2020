@@ -38,15 +38,16 @@ end
 
 function get_input(str=read("data/day14", String))
     tokens = split(str)
-    instrs = Vector{Union{MemOp, MaskOp}}()
-    for idx in 1:3:length(tokens)
-        op, ass, val = tokens[idx:idx+2]
+    instrs = Vector{Union{MemOp, MaskOp}}(undef, length(tokens)÷3)
+    for idx in 1:length(instrs)
+        tidx = (idx - 1) * 3 + 1
+        op, ass, val = @view tokens[tidx:tidx+2]
         if startswith(op, "mem")
-            dest = match(r"\[(\d+)\]$", op).captures[1]
-            dest, val = parse.(Int, (dest, val))
-            push!(instrs, MemOp(dest, val))
+            dest = parse(Int, @view op[5:end-1])
+            ival = parse(Int, val)
+            instrs[idx] = MemOp(dest, ival)
         elseif op == "mask"
-            push!(instrs, MaskOp(val))
+            instrs[idx] = MaskOp(val)
         else
             error("Unrecognized instruction: $op $ass $val")
         end
